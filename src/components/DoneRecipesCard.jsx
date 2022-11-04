@@ -13,15 +13,16 @@ export default function DoneRecipesCard(props) {
   const [copyLink, setCopyLink] = useState(false);
 
   const copyUrl = (param) => {
-    clip(`http://localhost:3000/${param.type}s/${param.id}`);
+    const index1 = window.location.href.indexOf('done-recipes');
+    const location = window.location.href.substring(0, index1 - 1);
+    clip(`${location}/${param.type}s/${param.id}`);
     setCopyLink(true);
   };
   return (
     <div>
       {doneRecipe.type === 'meal' ? (
-        <div key={ doneRecipe.id } className="Receipe__Card__container">
-          { copyLink && (<p>Link copied!</p>)}
-          <Link key={ index } to={ `/meals/${doneRecipe.id}` }>
+        <div key={ index } className="Receipe__Card__container">
+          <Link to={ `/meals/${doneRecipe.id}` }>
             <img
               data-testid={ `${index}-horizontal-image` }
               src={ doneRecipe.image }
@@ -32,7 +33,6 @@ export default function DoneRecipesCard(props) {
           <div className="Card__container1">
             <div className="Card__name__share">
               <Link
-                key={ index }
                 to={ `/meals/${doneRecipe.id}` }
                 className="Recipe__card__name"
               >
@@ -47,6 +47,7 @@ export default function DoneRecipesCard(props) {
               >
                 <img src={ Share } alt="Share" />
               </button>
+              { copyLink && (<p>Link copied!</p>)}
             </div>
             <p data-testid={ `${index}-horizontal-top-text` } className="Card__top__text">
               {`${doneRecipe.nationality} - ${doneRecipe.category}`}
@@ -64,9 +65,9 @@ export default function DoneRecipesCard(props) {
           </div>
         </div>
       ) : (
-        <div key={ doneRecipe.id } className="Receipe__Card__container">
+        <div key={ index } className="Receipe__Card__container">
           { copyLink && (<p>Link copied!</p>)}
-          <Link key={ index } to={ `/drinks/${doneRecipe.id}` }>
+          <Link to={ `/drinks/${doneRecipe.id}` }>
             <img
               data-testid={ `${index}-horizontal-image` }
               src={ doneRecipe.image }
@@ -77,7 +78,6 @@ export default function DoneRecipesCard(props) {
           <div className="Card__container1">
             <div className="Card__name__share">
               <Link
-                key={ index }
                 to={ `/drinks/${doneRecipe.id}` }
                 className="Recipe__card__name"
               >
