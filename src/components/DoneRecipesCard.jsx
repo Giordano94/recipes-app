@@ -46,8 +46,8 @@ export default function DoneRecipesCard(props) {
                 className="Card__btn__share"
               >
                 <img src={ Share } alt="Share" />
+                { copyLink && (<p>Link copied!</p>)}
               </button>
-              { copyLink && (<p>Link copied!</p>)}
             </div>
             <p data-testid={ `${index}-horizontal-top-text` } className="Card__top__text">
               {`${doneRecipe.nationality} - ${doneRecipe.category}`}
@@ -66,7 +66,6 @@ export default function DoneRecipesCard(props) {
         </div>
       ) : (
         <div key={ index } className="Receipe__Card__container">
-          { copyLink && (<p>Link copied!</p>)}
           <Link to={ `/drinks/${doneRecipe.id}` }>
             <img
               data-testid={ `${index}-horizontal-image` }
@@ -91,6 +90,7 @@ export default function DoneRecipesCard(props) {
                 className="Card__btn__share"
               >
                 <img src={ Share } alt="Share" />
+                { copyLink && (<p>Link copied!</p>)}
               </button>
             </div>
             <p data-testid={ `${index}-horizontal-top-text` } className="Card__top__text">
