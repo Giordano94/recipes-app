@@ -21,7 +21,9 @@ export default function FavoriteRecipes() {
     setFavs2(us);
   }, []);
   const handleClip = (id, type) => {
-    clip(`http://localhost:3000/${type}s/${id}`);
+    const index1 = window.location.href.indexOf('favorite-recipes');
+    const location = window.location.href.substring(0, index1 - 1);
+    clip(`${location}/${type}s/${id}`);
     setText(true);
   };
   const handleFavs = (elem) => {

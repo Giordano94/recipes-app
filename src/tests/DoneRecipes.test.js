@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 import App from '../App';
 import renderWithRouter from './renderWithRouter';
-import { setLocalStorage } from './utils/mockLocalStorage';
+import { setLocalStorage, clearLocalStorage } from './utils/mockLocalStorage';
 
 const mockRecipes = [
   {
@@ -74,8 +74,10 @@ describe('test  DoneRecipes page ', () => {
     });
 
     const mealButton = screen.getByTestId(filterByMealBtn);
+    const imgButtonMeals = screen.getByRole('img', { name: /buttonmeal/i });
     expect(mealButton).toBeDefined();
     userEvent.click(mealButton);
+    userEvent.click(imgButtonMeals);
 
     const mealEle = screen.findByText(mealName);
     expect(mealEle).toBeDefined();
@@ -85,6 +87,7 @@ describe('test  DoneRecipes page ', () => {
   });
 
   test('checks if the all button renders all recipes', async () => {
+    clearLocalStorage('doneRecipes');
     setLocalStorage('doneRecipes', mockRecipes);
 
     const { history } = renderWithRouter(<App />);
@@ -94,8 +97,10 @@ describe('test  DoneRecipes page ', () => {
     });
 
     const allButton = screen.getByTestId(filterByAllBtn);
+    const imgButtonAll = screen.getByRole('img', { name: /buttonall/i });
     expect(allButton).toBeDefined();
     userEvent.click(allButton);
+    userEvent.click(imgButtonAll);
 
     const mealEle = screen.findByText(mealName);
     expect(mealEle).toBeDefined();
@@ -104,6 +109,7 @@ describe('test  DoneRecipes page ', () => {
   });
 
   test('checks if the drink button renders drink recipes', async () => {
+    clearLocalStorage('doneRecipes');
     const mockClipboard = {
       writeText: jest.fn(),
     };
@@ -119,8 +125,10 @@ describe('test  DoneRecipes page ', () => {
     });
 
     const drinkButton = screen.getByTestId(filterByDrinkBtn);
+    const imgButtonDrink = screen.getByRole('img', { name: /buttondrink/i });
     expect(drinkButton).toBeDefined();
     userEvent.click(drinkButton);
+    userEvent.click(imgButtonDrink);
 
     const drinkEle = screen.findByText(drinkName);
     expect(drinkEle).toBeDefined();

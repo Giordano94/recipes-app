@@ -30,7 +30,7 @@ describe('Testando a tela de receitas', () => {
 
     userEvent.click(todos);
     const img6 = await screen.findAllByRole('img', undefined, { timeout: 5000 });
-    expect(img6.length).toBe(Number(17));
+    expect(img6.length).toBe(Number(19));
     expect(img6[0]).toBeInTheDocument();
   });
   it('2-drinks', async () => {

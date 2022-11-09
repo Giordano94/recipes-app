@@ -15,15 +15,10 @@ export default function MealInProgress() {
   const [mealVideoId, setMealVideoId] = useState('');
   const [mealIngredients, setMealIngredients] = useState([]);
   const [finishDisible, setFinishDisible] = useState(true);
+  const [localInProgress, setLocalInProgress] = useState({});
 
   const history = useHistory();
   const id = history.location.pathname.split('/')[2];
-
-  const getLocal = localStorageInProgressRecipes();
-
-  if (!Object.keys(getLocal.meals).includes(id)) {
-    getLocal.meals[id] = [];
-  }
 
   const { setApiMeal, setTypeRecipe } = useContext(Context);
 
@@ -38,6 +33,14 @@ export default function MealInProgress() {
         .filter((e) => e[0].includes('strIngredient') && e[1] !== '' && e[1] !== null)
         .map((e) => e[1]);
 
+      const getLocal = localStorageInProgressRecipes();
+
+      if (!Object.keys(getLocal.meals).includes(id)) {
+        getLocal.meals[id] = [];
+        setLocalInProgress(getLocal);
+      }
+
+      setLocalInProgress(getLocal);
       setTypeRecipe('meal');
       setMealIngredients(Ingredients);
       setMealVideoId(response.meals[0].strYoutube.split('=')[1]);
@@ -47,21 +50,30 @@ export default function MealInProgress() {
 
   const handleCheckbox = (target, element) => {
     if (target.checked) {
+      const newInProgress = { ...localInProgress };
+
+      newInProgress.meals[id] = [...newInProgress.meals[id], element];
+
+      localStorage.setItem('inProgressRecipes', JSON.stringify(newInProgress));
+      setLocalInProgress(newInProgress);
       target.parentNode.className = 'Recipe__label scratched';
-      getLocal.meals[id] = [...getLocal.meals[id], element];
-      localStorage.setItem('inProgressRecipes', JSON.stringify(getLocal));
-      if (JSON.stringify(getLocal.meals[id]) === JSON.stringify(mealIngredients)) {
+
+      if (newInProgress.meals[id].length === mealIngredients.length) {
         setFinishDisible(false);
       } else {
         setFinishDisible(true);
       }
     } else {
-      target.parentNode.className = 'Recipe__label';
-      const arrayLocalId = [...getLocal.meals[id]];
+      const newInProgress = { ...localInProgress };
+      const arrayLocalId = [...newInProgress.meals[id]];
       const index = arrayLocalId.indexOf(element);
+
       arrayLocalId.splice(index, 1);
-      getLocal.meals[id] = arrayLocalId;
-      localStorage.setItem('inProgressRecipes', JSON.stringify(getLocal));
+      newInProgress.meals[id] = arrayLocalId;
+
+      localStorage.setItem('inProgressRecipes', JSON.stringify(newInProgress));
+      setLocalInProgress(newInProgress);
+      target.parentNode.className = 'Recipe__label';
     }
   };
 
@@ -111,16 +123,16 @@ export default function MealInProgress() {
         <div data-testid="instructions" className="Foods-recipe-ingredient">
           {mealIngredients.map((e, index) => (
             <label
-              htmlFor={ e }
+              htmlFor={ index }
               key={ index }
               data-testid={ `${index}-ingredient-step` }
-              className={ getLocal.meals[id].includes(e)
+              className={ localInProgress.meals[id].includes(e)
                 ? 'Recipe__label scratched' : 'Recipe__label' }
             >
               <input
                 type="checkbox"
-                id={ e }
-                checked={ getLocal.meals[id].includes(e) || onchange }
+                id={ index }
+                defaultChecked={ localInProgress.meals[id].includes(e) || onchange }
                 onClick={ ({ target }) => handleCheckbox(target, e) }
                 className="checkbox"
               />

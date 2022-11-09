@@ -16,15 +16,10 @@ export default function DrinkInProgress() {
   const [drinkIngredients, setDrinkIngredients] = useState([]);
   const [drinkData, setDrinkData] = useState([]);
   const [finishDisible, setFinishDisible] = useState(true);
+  const [localInProgress, setLocalInProgress] = useState({});
 
   const history = useHistory();
   const id = history.location.pathname.split('/')[2];
-
-  const getLocal = localStorageInProgressRecipes();
-
-  if (!Object.keys(getLocal.drinks).includes(id)) {
-    getLocal.drinks[id] = [];
-  }
 
   const { setApiDrink, setTypeRecipe } = useContext(Context);
 
@@ -38,6 +33,15 @@ export default function DrinkInProgress() {
       const Ingredients = Object.entries(response.drinks[0])
         .filter((e) => e[0].includes('strIngredient') && e[1] !== '' && e[1] !== null)
         .map((e) => e[1]);
+
+      const getLocal = localStorageInProgressRecipes();
+
+      if (!Object.keys(getLocal.drinks).includes(id)) {
+        getLocal.drinks[id] = [];
+        setLocalInProgress(getLocal);
+      }
+
+      setLocalInProgress(getLocal);
       setDrinkIngredients(Ingredients);
       setTypeRecipe('drink');
     };
@@ -46,21 +50,29 @@ export default function DrinkInProgress() {
 
   const handleCheckbox = (target, element) => {
     if (target.checked) {
+      const newInProgress = { ...localInProgress };
+
+      newInProgress.drinks[id] = [...newInProgress.drinks[id], element];
+
+      localStorage.setItem('inProgressRecipes', JSON.stringify(newInProgress));
+      setLocalInProgress(newInProgress);
       target.parentNode.className = 'Recipe__label scratched';
-      getLocal.drinks[id] = [...getLocal.drinks[id], element];
-      localStorage.setItem('inProgressRecipes', JSON.stringify(getLocal));
-      if (JSON.stringify(getLocal.drinks[id]) === JSON.stringify(drinkIngredients)) {
+
+      if (newInProgress.drinks[id].length === drinkIngredients.length) {
         setFinishDisible(false);
       } else {
         setFinishDisible(true);
       }
     } else {
-      target.parentNode.className = 'Recipe__label';
-      const arrayLocalId = [...getLocal.drinks[id]];
+      const newInProgress = { ...localInProgress };
+      const arrayLocalId = [...newInProgress.drinks[id]];
       const index = arrayLocalId.indexOf(element);
+
       arrayLocalId.splice(index, 1);
-      getLocal.drinks[id] = arrayLocalId;
-      localStorage.setItem('inProgressRecipes', JSON.stringify(getLocal));
+      newInProgress.drinks[id] = arrayLocalId;
+      localStorage.setItem('inProgressRecipes', JSON.stringify(newInProgress));
+      setLocalInProgress(newInProgress);
+      target.parentNode.className = 'Recipe__label';
     }
   };
 
@@ -113,13 +125,13 @@ export default function DrinkInProgress() {
               htmlFor={ index }
               key={ index }
               data-testid={ `${index}-ingredient-step` }
-              className={ getLocal.drinks[id].includes(e)
+              className={ localInProgress.drinks[id].includes(e)
                 ? 'Recipe__label scratched' : 'Recipe__label' }
             >
               <input
                 type="checkbox"
                 id={ index }
-                checked={ getLocal.drinks[id].includes(e) || onchange }
+                defaultChecked={ localInProgress.drinks[id].includes(e) || onchange }
                 onChange={ ({ target }) => handleCheckbox(target, e) }
               />
               <p className="Recipe__Ingredient__name">{e}</p>
